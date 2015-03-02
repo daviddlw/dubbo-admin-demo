@@ -1,8 +1,11 @@
 package com.david.test;
 
 import static org.junit.Assert.*;
+
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -135,9 +138,20 @@ public class TestFtpUtils
 	@Test
 	public void testGetFileList() throws IOException
 	{
-		List<String> files = ftpUtils.getFileList("");
-		System.out.println("file.size()=>" + files.size());
+		List<String> files = ftpUtils.getFileList("sourcelib");
+		System.out.println("file.size()=> " + files.size());
 		for (String item : files)
+		{
+			System.out.println(item);
+		}
+	}
+
+	@Test
+	public void testGetDirectoryAndFiles() throws IOException
+	{
+		Map<String, List<String>> rsMap = ftpUtils.getDirectoryAndFiles("binlib");
+		System.out.println("rsMap.size()=> " + rsMap.size());
+		for (Entry<String, List<String>> item : rsMap.entrySet())
 		{
 			System.out.println(item);
 		}

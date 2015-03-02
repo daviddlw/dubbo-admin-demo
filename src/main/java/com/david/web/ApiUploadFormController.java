@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -17,9 +16,7 @@ import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.Controller;
 
-import com.david.domain.FtpUtils;
 import com.david.domain.JarApi;
 import com.david.domain.JarType;
 
@@ -30,15 +27,10 @@ public class ApiUploadFormController extends BasicController
 	private static final String TXT_VERSION = "txtVersion";
 	private static final String HD_SERVICE_NAME = "hdServiceName";
 	private static final String FILE = "file";
-	private static String FTP_SERVER = "192.168.8.116";
-	private static int PORT = 48790;
-	private static String USERNAME = "daviddai";
-	private static String PASSWORD = "123456";
 
 	private final Logger logger = Logger.getLogger(ApiUploadFormController.class);
 	private final String UTF_8 = "UTF-8";
 
-	private FtpUtils ftpUtils = new FtpUtils();
 
 	@Override
 	public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception

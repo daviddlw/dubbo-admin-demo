@@ -6,7 +6,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
@@ -125,7 +127,7 @@ public class FtpUtils
 	{
 		return ftp.makeDirectory(pathName);
 	}
-	
+
 	/**
 	 * 移除目录
 	 * 
@@ -171,6 +173,46 @@ public class FtpUtils
 		}
 
 		return removeDirectory(pathName);
+	}
+
+	public Map<String, List<String>> getDirectoryAndFiles(String pathName) throws IOException
+	{
+		Map<String, List<String>> rsMap = new HashMap<String, List<String>>();
+
+		FTPFile[] ftpFiles = ftp.listFiles(pathName);
+
+		if (ftpFiles == null || ftpFiles.length == 0)
+		{
+			return rsMap;
+		}
+
+		List<String> subFiles = null;
+		for (FTPFile file : ftpFiles)
+		{
+			if (file.isDirectory())
+			{
+				if (!rsMap.containsKey(file.getName()))
+				{
+					rsMap.put(file.getName(), new ArrayList<String>());
+				}
+
+			} else
+			{
+				rsMap.put("defaultlib", new ArrayList<String>());
+			}
+
+			subFiles = rsMap.get(file.getName());
+			FTPFile[] subFtpFiles = ftp.listFiles(pathName + "/" + file.getName());
+			for (FTPFile subFile : subFtpFiles)
+			{
+				if (subFile.isFile())
+				{
+					subFiles.add(subFile.getName());
+				}
+			}
+		}
+
+		return rsMap;
 	}
 
 	/**
@@ -264,6 +306,7 @@ public class FtpUtils
 
 	/**
 	 * 上传文件
+	 * 
 	 * @param in
 	 *            文件流
 	 * @param newName
