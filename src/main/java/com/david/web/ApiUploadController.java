@@ -1,29 +1,27 @@
 package com.david.web;
 
-import java.util.Date;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.Controller;
 
-public class ApiUploadController implements Controller
+import com.david.domain.JarApi;
+
+public class ApiUploadController extends BasicController
 {
 	private final Logger logger = Logger.getLogger(ApiUploadController.class);
-	
+
 	@Override
 	public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception
 	{
 		logger.info("Returning the apiUpload view.");
-		Date now = new Date();
-		String nowVal = now.toString();
-		logger.info("now: " + nowVal);
-		logger.info("request: "+ request);
-		logger.info("response: "+ response);
 		
-		return new ModelAndView("apiUpload");
-	}
+		String serviceName = getServiceName(request);
+		
+		JarApi jarApi = new JarApi();
+		jarApi.setServiceName(serviceName);
 
+		return new ModelAndView("apiUpload", "model", jarApi);
+	}
 }

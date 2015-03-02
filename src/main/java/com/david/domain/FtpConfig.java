@@ -1,7 +1,7 @@
-package com.david.test;
+package com.david.domain;
 
 /**
- * Ftp����������
+ * Ftp工具类
  * 
  * @author dailiwei
  * 

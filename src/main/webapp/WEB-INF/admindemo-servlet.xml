@@ -12,8 +12,13 @@
 	<bean name="/test.do" class="com.david.web.TestController"></bean>
 	<bean name="/forward.do" class="com.david.web.ForwardController"></bean>
 	<bean name="/redirect.do" class="com.david.web.RedirectController"></bean>
+	<bean name="/apiUploadForm.do" class="com.david.web.ApiUploadFormController"></bean>
 	
-
+	<bean id="ftpConfig" class="com.david.domain.FtpConfig">
+		<property name="username" value="davidai"></property>
+		<property name="password" value="123456"></property>
+	</bean>
+	
 	<bean name="viewResolver"
 		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
 		<property name="viewClass"

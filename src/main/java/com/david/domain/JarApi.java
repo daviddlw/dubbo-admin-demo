@@ -1,16 +1,20 @@
 package com.david.domain;
 
+import java.io.InputStream;
+
 /**
  * Jar API所用实体
+ * 
  * @author pc
- *
+ * 
  */
 public class JarApi
 {
 	private String serviceName;
 	private String version;
-	private ApiType type;
-	private String filepath;
+	private JarType type;
+	private String fileName;
+	private InputStream file;
 
 	public JarApi()
 	{
@@ -18,13 +22,14 @@ public class JarApi
 		// TODO Auto-generated constructor stub
 	}
 
-	public JarApi(String serviceName, String version, ApiType type, String filepath)
+	public JarApi(String serviceName, String version, JarType type, String fileName, InputStream file)
 	{
 		super();
 		this.serviceName = serviceName;
 		this.version = version;
 		this.type = type;
-		this.filepath = filepath;
+		this.fileName = fileName;
+		this.file = file;
 	}
 
 	public String getServiceName()
@@ -47,31 +52,40 @@ public class JarApi
 		this.version = version;
 	}
 
-	public ApiType getType()
+	public JarType getType()
 	{
 		return type;
 	}
 
-	public void setType(ApiType type)
+	public void setType(JarType type)
 	{
 		this.type = type;
 	}
 
-	public String getFilepath()
+	public String getFileName()
 	{
-		return filepath;
+		return fileName;
 	}
 
-	public void setFilepath(String filepath)
+	public void setFileName(String fileName)
 	{
-		this.filepath = filepath;
+		this.fileName = fileName;
+	}
+
+	public InputStream getFile()
+	{
+		return file;
+	}
+
+	public void setFile(InputStream file)
+	{
+		this.file = file;
 	}
 
 	@Override
 	public String toString()
 	{
-		return "JarApi [serviceName=" + serviceName + ", version=" + version + ", type=" + type + ", filepath="
-				+ filepath + "]";
+		return "JarApi [serviceName=" + serviceName + ", version=" + version + ", type=" + type + ", fileName=" + fileName + "]";
 	}
 
 }

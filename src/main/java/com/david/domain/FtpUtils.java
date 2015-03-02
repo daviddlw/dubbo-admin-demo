@@ -1,4 +1,4 @@
-package com.david.test;
+package com.david.domain;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,7 +13,7 @@ import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 
 /**
- * Ftp������
+ * Ftp工具类
  * 
  * @author dailiwei
  * 
@@ -29,7 +29,7 @@ public class FtpUtils
 	{
 		ftp = new FTPClient();
 	}
-	
+
 	public FTPClient getFtp()
 	{
 		return ftp;
@@ -41,10 +41,10 @@ public class FtpUtils
 	}
 
 	/**
-	 * ��ʼ���ͻ��˲���ɶȷ���˵�����
+	 * 连接服务器
 	 * 
 	 * @param ftpConfig
-	 *            ftp������
+	 *            ftp配置类
 	 * @throws IOException
 	 */
 	public void connectServer(FtpConfig ftpConfig) throws IOException
@@ -58,29 +58,28 @@ public class FtpUtils
 	}
 
 	/**
-	 * ��ʼ���ͻ��˲�����ɶԷ���˵�����
+	 * 连接服务器
 	 * 
 	 * @param server
-	 *            ����˵�ַ
+	 *            服务器IP
 	 * @param port
-	 *            ����˶˿�
+	 *            服务器端口
 	 * @param username
-	 *            ftp�û���
+	 *            用户名
 	 * @param password
-	 *            ftp����
+	 *            密码
 	 * @param path
-	 *            Զ��·��������Ϊ��ֵ
+	 *            上传文件路径
 	 * @throws IOException
 	 */
 	public void connectServer(String server, int port, String username, String password, String path) throws IOException
 	{
 		ftp.connect(server, port);
 		ftp.setDataTimeout(DATA_TIME_OUT);
-/*		if (!FTPReply.isPositiveCompletion(ftp.getReply()))
-		{
-			ftp.disconnect();
-			System.out.println(server + "�ܾ����ӷ���...");
-		}*/
+		/*
+		 * if (!FTPReply.isPositiveCompletion(ftp.getReply())) {
+		 * ftp.disconnect(); System.out.println(server + "�ܾ����ӷ���..."); }
+		 */
 		ftp.login(username, password);
 		if (path.length() != 0)
 		{
@@ -89,10 +88,10 @@ public class FtpUtils
 	}
 
 	/**
-	 * ����ftp���ļ�����
+	 * 设置文件类型
 	 * 
 	 * @param fileType
-	 *            �ļ�����
+	 *            文件类型
 	 * @throws IOException
 	 */
 	public void setFileType(int fileType) throws IOException
@@ -101,7 +100,7 @@ public class FtpUtils
 	}
 
 	/**
-	 * �ر�ftp����
+	 * 关闭服务器
 	 * 
 	 * @throws IOException
 	 */
@@ -115,23 +114,24 @@ public class FtpUtils
 	}
 
 	/**
-	 * �ڷ������˴���һ��Ŀ¼
+	 * 创建目录
 	 * 
 	 * @param pathName
-	 *            ���������Ŀ¼���߾��Ŀ¼
-	 * @return �Ƿ񴴽��ɹ�
+	 *            文件路径名
+	 * @return 是否创建成功
 	 * @throws IOException
 	 */
 	public boolean createDirectory(String pathName) throws IOException
 	{
 		return ftp.makeDirectory(pathName);
 	}
-
+	
 	/**
-	 * �ڷ�������ɾ��һ��Ŀ¼�����Ϊ�գ�
+	 * 移除目录
 	 * 
 	 * @param pathName
-	 * @return �Ƿ�ɾ���
+	 *            文件路径名
+	 * @return 是否移除成功
 	 * @throws IOException
 	 */
 	public boolean removeDirectory(String pathName) throws IOException
@@ -140,12 +140,12 @@ public class FtpUtils
 	}
 
 	/**
-	 * �ڷ�������ɾ��һ��ftp�������ϵ�Ŀ¼
+	 * 移除目录
 	 * 
 	 * @param pathName
-	 *            Ŀ¼·��
+	 *            文件路径名
 	 * @param isAll
-	 *            �Ƿ�ɾ������Ŀ¼���ļ��������
+	 *            是否级联删除
 	 * @return
 	 * @throws IOException
 	 */
@@ -174,10 +174,10 @@ public class FtpUtils
 	}
 
 	/**
-	 * ���ظ�Ŀ¼�µ��ļ�
+	 * 获取文件列表
 	 * 
 	 * @param pathName
-	 * @return FTPFile��ɵļ���
+	 * @return FTPFile文件列表
 	 * @throws IOException
 	 */
 	public List<String> getFileList(String pathName) throws IOException
@@ -202,11 +202,11 @@ public class FtpUtils
 	}
 
 	/**
-	 * �ڷ�������ɾ��һ���ļ�
+	 * 删除服务器上的文件
 	 * 
 	 * @param pathName
-	 *            �ļ���
-	 * @return �Ƿ�ɾ��ɹ�
+	 *            文件名
+	 * @return 是否删除成功
 	 * @throws IOException
 	 */
 	public boolean deleteFile(String pathName) throws IOException
@@ -215,13 +215,13 @@ public class FtpUtils
 	}
 
 	/**
-	 * �ϴ��ļ�����������
+	 * 上传文件
 	 * 
 	 * @param fileName
-	 *            �ϴ����ļ�����Ŀ¼���ļ���
+	 *            文件名
 	 * @param newName
-	 *            �µ��ļ���
-	 * @return �Ƿ��ϴ��ɹ�
+	 *            重命名后的文件
+	 * @return 是否上传成功
 	 * @throws IOException
 	 */
 	public boolean uploadFile(String fileName, String newName) throws IOException
@@ -232,7 +232,7 @@ public class FtpUtils
 		try
 		{
 			bin = new FileInputStream(fileName);
-			flag = ftp.storeFile(newName, bin);			
+			flag = ftp.storeFile(newName, bin);
 
 		} catch (IOException e)
 		{
@@ -250,11 +250,11 @@ public class FtpUtils
 	}
 
 	/**
-	 * �ϴ��ļ�
+	 * 上传文件
 	 * 
 	 * @param fileName
-	 *            �ϴ����ļ�����Ŀ¼���ļ���
-	 * @return �Ƿ��ϴ��ɹ�
+	 *            文件名
+	 * @return 是否上传成功
 	 * @throws IOException
 	 */
 	public boolean uploadFile(String fileName) throws IOException
@@ -263,13 +263,12 @@ public class FtpUtils
 	}
 
 	/**
-	 * �ϴ��ļ�����InputStream
-	 * 
+	 * 上传文件
 	 * @param in
-	 *            �ļ���
+	 *            文件流
 	 * @param newName
-	 *            �µ��ļ���
-	 * @return �Ƿ��ϴ��ɹ�
+	 *            新的文件名
+	 * @return 是否上传成功
 	 * @throws IOException
 	 */
 	public boolean uploadFile(InputStream in, String newName) throws IOException
@@ -294,13 +293,13 @@ public class FtpUtils
 	}
 
 	/**
-	 * �����ļ�
+	 * 下载文件
 	 * 
 	 * @param remoteFile
-	 *            Զ���ļ���
+	 *            远程服务器路径
 	 * @param localFile
-	 *            �����ļ�
-	 * @return �Ƿ����سɹ�
+	 *            本地路径
+	 * @return 是否下载成功
 	 * @throws IOException
 	 */
 	public boolean downloadFile(String remoteFile, String localFile) throws IOException
@@ -331,11 +330,11 @@ public class FtpUtils
 	}
 
 	/**
-	 * �����ļ������ļ���
+	 * 下载文件
 	 * 
 	 * @param sourceFile
-	 *            Զ���ļ�
-	 * @return �Ƿ����سɹ�
+	 *            原文件路径
+	 * @return 是否下载成功
 	 * @throws IOException
 	 */
 	public InputStream downloadFile(String sourceFile) throws IOException
