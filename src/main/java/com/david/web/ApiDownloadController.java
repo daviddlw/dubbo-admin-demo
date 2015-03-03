@@ -16,7 +16,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.david.domain.ApiDownloadModel;
 import com.david.domain.FtpFile;
-import com.david.domain.JarApi;
 
 public class ApiDownloadController extends BasicController
 {
