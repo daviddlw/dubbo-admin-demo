@@ -12,7 +12,7 @@
 	<br />
 	<div>
 		<h2>Source Jar</h2>
-		<table style="width: 50%;" cellpadding="2" cellspacing="0" border="1"
+		<table style="width: 80%;" cellpadding="2" cellspacing="0" border="1"
 			bordercolor="#000000">
 			<tbody>
 				<tr>
@@ -32,7 +32,7 @@
 	<br />
 	<div>
 		<h2>Bin Jar</h2>
-		<table style="width: 50%;" cellpadding="2" cellspacing="0" border="1"
+		<table style="width: 80%;" cellpadding="2" cellspacing="0" border="1"
 			bordercolor="#000000">
 			<tbody>
 				<tr>
