@@ -19,6 +19,7 @@ import com.david.domain.FtpFile;
 
 public class ApiDownloadController extends BasicController
 {
+	private static final String HUPU_SOA_CLIENT_PHP = "HupuSOAClient.php";
 	private final Logger logger = Logger.getLogger(ApiDownloadController.class);
 
 	@Override
@@ -35,7 +36,7 @@ public class ApiDownloadController extends BasicController
 	}
 
 	/**
-	 * 获取指定服务的sourcelib与binlib
+	 * 获取指定服务的sourcelib,binlib,phpclass
 	 * 
 	 * @param serviceName
 	 *            需要过滤的服务名称，如果没有则获取全部服务 文件命名方式：服务名-jar包名
@@ -46,6 +47,7 @@ public class ApiDownloadController extends BasicController
 		Map<String, List<FtpFile>> rsMap = new HashMap<String, List<FtpFile>>();
 		rsMap.put(SOURCELIB, new ArrayList<FtpFile>());
 		rsMap.put(BINLIB, new ArrayList<FtpFile>());
+		rsMap.put(PHPLIB, new ArrayList<FtpFile>());
 
 		try
 		{
@@ -54,6 +56,9 @@ public class ApiDownloadController extends BasicController
 
 			addToMap(rsMap, model.getServiceName(), SOURCELIB);
 			addToMap(rsMap, model.getServiceName(), BINLIB);
+			addToMap(rsMap, model.getServiceName(), PHPLIB);
+
+			logger.info("finish generate apiDownload model...");
 
 			ftpUtils.closeServer();
 			logger.info("close the ftp server...");
@@ -66,6 +71,7 @@ public class ApiDownloadController extends BasicController
 
 		model.setSourceLib(rsMap.get(SOURCELIB));
 		model.setBinLib(rsMap.get(BINLIB));
+		model.setPhpLib(rsMap.get(PHPLIB));
 
 		return model;
 	}
@@ -82,6 +88,7 @@ public class ApiDownloadController extends BasicController
 			{
 				key = item.getKey();
 				fileList = item.getValue();
+
 				if (key.equalsIgnoreCase("defaultlib") || fileList == null || fileList.size() == 0)
 				{
 					continue;

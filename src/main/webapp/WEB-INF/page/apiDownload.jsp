@@ -49,5 +49,25 @@
 			</tbody>
 		</table>
 	</div>
+
+	<div>
+		<h2>PHP Class</h2>
+		<table style="width: 80%;" cellpadding="2" cellspacing="0" border="1"
+			bordercolor="#000000">
+			<tbody>
+				<tr>
+					<td>文件名</td>
+					<td>下载地址</td>
+				</tr>
+				<c:forEach items="${model.phpLib}" var="phpLib">
+					<tr>
+						<td><c:out value="${phpLib.fileName}"></c:out></td>
+						<td><a href="${phpLib.ftpFilepath}"><c:out
+									value="${phpLib.fileName}"></c:out></a></td>
+					</tr>
+				</c:forEach>
+			</tbody>
+		</table>
+	</div>
 </body>
 </html>

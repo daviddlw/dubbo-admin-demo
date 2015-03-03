@@ -80,7 +80,7 @@ public class FtpUtils
 		ftp.setDataTimeout(DATA_TIME_OUT);
 		/*
 		 * if (!FTPReply.isPositiveCompletion(ftp.getReply())) {
-		 * ftp.disconnect(); System.out.println(server + "�ܾ����ӷ���..."); }
+		 * ftp.disconnect(); System.out.println(server + "cannot connect..."); }
 		 */
 		ftp.login(username, password);
 		if (path.length() != 0)
@@ -98,7 +98,7 @@ public class FtpUtils
 	 */
 	public void setFileType(int fileType) throws IOException
 	{
-		ftp.setFileType(fileType);
+		ftp.setFileType(fileType);		
 	}
 
 	/**

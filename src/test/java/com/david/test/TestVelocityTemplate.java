@@ -13,10 +13,9 @@ public class TestVelocityTemplate
 	{
 	}
 
-	@Test
-	public void test()
+	public void testGenerateVelocityTemplate()
 	{
-		fail("Not yet implemented");
+		
 	}
 
 }

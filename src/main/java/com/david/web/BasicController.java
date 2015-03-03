@@ -4,18 +4,20 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.web.servlet.mvc.Controller;
 
+import com.david.common.CommonUtils;
 import com.david.domain.FtpUtils;
 
 public abstract class BasicController implements Controller
 {
 	protected static final String TEST_SERVICE = "com.david.TestService";
-	protected static String FTP_SERVER = "192.168.8.116";
-	protected static int PORT = 48790;
-	protected static String USERNAME = "daviddai";
-	protected static String PASSWORD = "123456";
-	protected static String SOURCELIB = "sourcelib";
-	protected static String BINLIB = "binlib";
-	protected static String FTP_DOWNLOAD_PATH_PREFIX = "ftp://192.168.8.116:48790";
+	protected static final String FTP_SERVER = CommonUtils.FTP_SERVER;
+	protected static final int PORT = CommonUtils.PORT;
+	protected static final String USERNAME = CommonUtils.USERNAME;
+	protected static final String PASSWORD = CommonUtils.PASSWORD;
+	protected static final String SOURCELIB = "sourcelib";
+	protected static final String BINLIB = "binlib";
+	protected static final String PHPLIB = "phplib";
+	protected static final String FTP_DOWNLOAD_PATH_PREFIX = "ftp://192.168.8.116:48790";
 	protected FtpUtils ftpUtils = new FtpUtils();
 
 	/**

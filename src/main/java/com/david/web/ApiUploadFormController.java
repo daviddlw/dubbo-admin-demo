@@ -1,9 +1,11 @@
 package com.david.web;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -14,6 +16,7 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.net.ftp.FTPFile;
 import org.apache.log4j.Logger;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -31,14 +34,13 @@ public class ApiUploadFormController extends BasicController
 	private final Logger logger = Logger.getLogger(ApiUploadFormController.class);
 	private final String UTF_8 = "UTF-8";
 
-
 	@Override
 	public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception
 	{
 		logger.info("Returning the apiUploadForm action.");
-		request.setCharacterEncoding(UTF_8);		
-		fileUpload(request, response);		
-
+		request.setCharacterEncoding(UTF_8);
+		fileUpload(request, response);
+		
 		return null;
 	}
 
@@ -55,7 +57,7 @@ public class ApiUploadFormController extends BasicController
 
 		FileItemFactory factory = new DiskFileItemFactory();
 		ServletFileUpload fileUpload = new ServletFileUpload(factory);
-
+		
 		logger.info("isMutipart: " + isMutipart);
 		try
 		{
@@ -80,7 +82,7 @@ public class ApiUploadFormController extends BasicController
 
 			JarApi jarApi = new JarApi();
 			serviceName = (String) request.getAttribute(HD_SERVICE_NAME);
-			jarApi.setServiceName(serviceName);			
+			jarApi.setServiceName(serviceName);
 			jarApi.setVersion((String) request.getAttribute(TXT_VERSION));
 			jarApi.setFileName((String) request.getAttribute(TXT_FILEPATH));
 			String type = (String) request.getAttribute(DL_API_TYPE);
@@ -90,15 +92,13 @@ public class ApiUploadFormController extends BasicController
 			logger.info("JarApi: " + jarApi);
 
 			// 上传ftp服务器
-			uploadToFtp(jarApi);
-			
-			
+//			uploadToFtp(jarApi);
 
 		} catch (FileUploadException e)
 		{
 			logger.error(e.getMessage(), e);
 		}
-		
+
 		response.sendRedirect("apiDownload.do?serviceName=" + serviceName);
 	}
 
@@ -154,6 +154,71 @@ public class ApiUploadFormController extends BasicController
 		{
 			logger.error(e.getMessage(), e);
 		}
+	}
+
+	/**
+	 * 生成php文件方法
+	 */
+	private void generatePhpClassFile(JarApi jarApi)
+	{
+		String serviceName = jarApi.getServiceName();
+		String sourceFilepath = "sourcelib" + "/" + serviceName;
+		String phpFilepath = "phplib" + "/" + serviceName;
+
+		boolean isCreateDirectory;
+		try
+		{
+			isCreateDirectory = ftpUtils.createDirectory(phpFilepath);
+			String phpClass = generatePhpClassName(jarApi);
+			logger.info("isCreatePhpDirectory=> " + isCreateDirectory + " || phpClass=> " + phpClass);
+
+			List<String> files = ftpUtils.getFileList(sourceFilepath);
+			String tempPath = sourceFilepath;
+			for (String file : files)
+			{
+				tempPath = tempPath + "/" + file;
+			}
+
+		} catch (IOException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 将Java Source Api翻译成php Class
+	 */
+	private void translateJavaToPhp()
+	{
+
+	}
+
+	/**
+	 * 生成phpClass Name
+	 * 
+	 * @param jarApi
+	 * @return phpClassName
+	 */
+	private String generatePhpClassName(JarApi jarApi)
+	{
+
+		String name = StringUtils.EMPTY;
+		String version = StringUtils.EMPTY;
+		String result = StringUtils.EMPTY;
+		if (jarApi.getServiceName().contains("."))
+		{
+			name = StringUtils.substringAfterLast(jarApi.getServiceName(), ".");
+		} else
+		{
+			name = jarApi.getServiceName();
+		}
+
+		// 如果没有填写版本默认设置为1.0.0
+		version = (jarApi.getVersion() == null || jarApi.getVersion().isEmpty()) ? "1.0.0" : jarApi.getVersion();
+		result = String.format("%s-%s.php", name, version);
+
+		return result;
 	}
 
 	/**

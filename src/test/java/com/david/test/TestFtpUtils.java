@@ -2,7 +2,11 @@ package com.david.test;
 
 import static org.junit.Assert.*;
 
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -14,6 +18,7 @@ import org.junit.Test;
 
 import sun.tools.jar.resources.jar;
 
+import com.david.common.CommonUtils;
 import com.david.domain.FtpUtils;
 import com.david.domain.JarApi;
 import com.david.domain.JarType;
@@ -31,11 +36,65 @@ public class TestFtpUtils
 	private static String VALID_JAR_NAME = "xom-1.0.6.jar";
 	private static String VALID_SOURCES_JAR_NAME = "xom-1.0.6-sources.jar";
 
+	private static String VALID_PHP_NAME = "MonitorService-1.0.0.php";
+
 	@Before
 	public void setUp() throws Exception
 	{
 		ftpUtils.connectServer(ftpServer, port, "daviddai", "123456", "");
 
+	}
+
+	@Test
+	public void testLoadClassFromFtpServer() throws IOException
+	{
+		String path = "sourcelib/com.david.DavidService/hessian-3.0.0-sources.jar";
+		System.out.println(path);
+
+		boolean flag = ftpUtils.downloadFile(path, "tempfile/hessian-3.0.0-sources.jar");
+		System.out.println("下载临时文件=>" + flag);
+	}
+
+	@Test
+	public void testPropertiesConfiguration()
+	{
+		System.out.println(CommonUtils.FTP_SERVER);
+		System.out.println(CommonUtils.PORT);
+		System.out.println(CommonUtils.USERNAME);
+		System.out.println(CommonUtils.PASSWORD);
+	}
+
+	@Test
+	public void testGeneratePhpClassName()
+	{
+		JarApi jarApi = new JarApi();
+		jarApi.setServiceName("com.alibaba.dubbo.monitor.MonitorService");
+		jarApi.setVersion("1.0.0");
+
+		String phpClassName = generatePhpClassName(jarApi);
+		assertEquals(phpClassName, VALID_PHP_NAME);
+		System.out.println(phpClassName);
+	}
+
+	private String generatePhpClassName(JarApi jarApi)
+	{
+
+		String name = StringUtils.EMPTY;
+		String version = StringUtils.EMPTY;
+		String result = StringUtils.EMPTY;
+		if (jarApi.getServiceName().contains("."))
+		{
+			name = StringUtils.substringAfterLast(jarApi.getServiceName(), ".");
+		} else
+		{
+			name = jarApi.getServiceName();
+		}
+
+		// 如果没有填写版本默认设置为1.0.0
+		version = (jarApi.getVersion() == null || jarApi.getVersion().isEmpty()) ? "1.0.0" : jarApi.getVersion();
+		result = String.format("%s-%s.php", name, version);
+
+		return result;
 	}
 
 	/**

@@ -7,6 +7,7 @@ public class ApiDownloadModel
 	private String serviceName;
 	private List<FtpFile> sourceLib;
 	private List<FtpFile> binLib;
+	private List<FtpFile> phpLib;
 
 	public ApiDownloadModel()
 	{
@@ -14,12 +15,13 @@ public class ApiDownloadModel
 		// TODO Auto-generated constructor stub
 	}
 
-	public ApiDownloadModel(String serviceName, List<FtpFile> sourceLib, List<FtpFile> binLib)
+	public ApiDownloadModel(String serviceName, List<FtpFile> sourceLib, List<FtpFile> binLib, List<FtpFile> phpLib)
 	{
 		super();
 		this.serviceName = serviceName;
 		this.sourceLib = sourceLib;
 		this.binLib = binLib;
+		this.phpLib = phpLib;
 	}
 
 	public String getServiceName()
@@ -52,10 +54,21 @@ public class ApiDownloadModel
 		this.binLib = binLib;
 	}
 
+	public List<FtpFile> getPhpLib()
+	{
+		return phpLib;
+	}
+
+	public void setPhpLib(List<FtpFile> phpLib)
+	{
+		this.phpLib = phpLib;
+	}
+
 	@Override
 	public String toString()
 	{
-		return "ApiDownloadModel [serviceName=" + serviceName + ", sourceLib=" + sourceLib + ", binLib=" + binLib + "]";
+		return "ApiDownloadModel [serviceName=" + serviceName + ", sourceLib=" + sourceLib + ", binLib=" + binLib + ", phpLib=" + phpLib
+				+ "]";
 	}
 
 }
