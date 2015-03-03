@@ -51,13 +51,13 @@ public class ApiDownloadController extends BasicController
 		try
 		{
 			ftpUtils.connectServer(FTP_SERVER, PORT, USERNAME, PASSWORD, "");
-			logger.info("连接服务器...");
+			logger.info("connect to ftp server...");
 
 			addToMap(rsMap, model.getServiceName(), SOURCELIB);
 			addToMap(rsMap, model.getServiceName(), BINLIB);
 
 			ftpUtils.closeServer();
-			logger.info("关闭服务器...");
+			logger.info("close the ftp server...");
 
 		} catch (IOException e)
 		{

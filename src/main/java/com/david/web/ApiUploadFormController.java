@@ -115,7 +115,7 @@ public class ApiUploadFormController extends BasicController
 		try
 		{
 			ftpUtils.connectServer(FTP_SERVER, PORT, USERNAME, PASSWORD, "");
-			logger.info("连接服务器...");
+			logger.info("connect to ftp server...");
 
 			/*
 			 * 文件上传规则 根目录文件夹维servicelib 1.
@@ -144,11 +144,11 @@ public class ApiUploadFormController extends BasicController
 
 			// 上传到ftp服务器
 			boolean isSuccess = ftpUtils.uploadFile(jarApi.getFile(), filepath + "/" + newJarName);
-			logger.info("是否上传成功：" + isSuccess);
+			logger.info("is upload success：" + isSuccess);
 
 			// 关闭服务器
 			ftpUtils.closeServer();
-			logger.info("关闭服务器...");
+			logger.info("close the server...");
 
 		} catch (IOException e)
 		{
