@@ -92,7 +92,7 @@ public class ApiUploadFormController extends BasicController
 			logger.info("JarApi: " + jarApi);
 
 			// 上传ftp服务器
-//			uploadToFtp(jarApi);
+			uploadToFtp(jarApi);
 
 		} catch (FileUploadException e)
 		{
