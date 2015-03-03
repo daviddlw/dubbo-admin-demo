@@ -25,7 +25,7 @@ public class CustomContextLoaderListener implements ServletContextListener
 	{
 		// TODO Auto-generated method stub
 		logger.info("contextInitialized...");
-		scheduledTaskRun();
+//		scheduledTaskRun();
 	}
 
 	@Override

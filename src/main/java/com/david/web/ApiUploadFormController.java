@@ -1,11 +1,15 @@
 package com.david.web;
 
-import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -16,8 +20,10 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.net.ftp.FTPFile;
 import org.apache.log4j.Logger;
+import org.apache.velocity.Template;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.VelocityEngine;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.david.domain.JarApi;
@@ -40,7 +46,7 @@ public class ApiUploadFormController extends BasicController
 		logger.info("Returning the apiUploadForm action.");
 		request.setCharacterEncoding(UTF_8);
 		fileUpload(request, response);
-		
+
 		return null;
 	}
 
@@ -57,7 +63,7 @@ public class ApiUploadFormController extends BasicController
 
 		FileItemFactory factory = new DiskFileItemFactory();
 		ServletFileUpload fileUpload = new ServletFileUpload(factory);
-		
+
 		logger.info("isMutipart: " + isMutipart);
 		try
 		{
@@ -92,7 +98,7 @@ public class ApiUploadFormController extends BasicController
 			logger.info("JarApi: " + jarApi);
 
 			// 上传ftp服务器
-			uploadToFtp(jarApi);
+			uploadToFtp(jarApi, request, response);
 
 		} catch (FileUploadException e)
 		{
@@ -108,7 +114,7 @@ public class ApiUploadFormController extends BasicController
 	 * @param jarApi
 	 * @return
 	 */
-	private void uploadToFtp(JarApi jarApi)
+	private void uploadToFtp(JarApi jarApi, HttpServletRequest request, HttpServletResponse response)
 	{
 		logger.info("==========执行ftp上传=============");
 
@@ -146,9 +152,16 @@ public class ApiUploadFormController extends BasicController
 			boolean isSuccess = ftpUtils.uploadFile(jarApi.getFile(), filepath + "/" + newJarName);
 			logger.info("is upload success：" + isSuccess);
 
+			// 执行java转化php的任务，只有执行上传Jar Source的命令时候才进行上传
+			if (jarApi.getType() == JarType.Source)
+			{
+				executeTranslateTask(jarApi, request, response);
+			}
+
 			// 关闭服务器
-			ftpUtils.closeServer();
-			logger.info("close the server...");
+			/*
+			 * ftpUtils.closeServer(); logger.info("close the server...");
+			 */
 
 		} catch (IOException e)
 		{
@@ -157,26 +170,107 @@ public class ApiUploadFormController extends BasicController
 	}
 
 	/**
-	 * 生成php文件方法
+	 * 执行后台任务转化为php任务
+	 * 
+	 * @param jarApi
 	 */
-	private void generatePhpClassFile(JarApi jarApi)
+	private void executeTranslateTask(JarApi jarApi, HttpServletRequest request, HttpServletResponse response)
+	{
+		final JarApi runJarApi = jarApi;
+		final HttpServletRequest runRequest = request;
+
+		Runnable task = new Runnable() {
+
+			@Override
+			public void run()
+			{
+				try
+				{
+					// 尝试开启Ftp服务器连接如果开着则不必重新连接ftp工具类内部做了判断
+					ftpUtils.connectServer(FTP_SERVER, PORT, USERNAME, PASSWORD, "");
+					logger.info("php转化后台任务重新连接ftp服务器...");
+
+					// 从source bin读取文件下载到项目下的临时目录tempfile
+					downloadToTempFile(runJarApi, runRequest);
+
+					// 解析source jar使用vm模板翻译成php class
+					InputStream in = null;
+					in = getTestVmFile();
+
+					// 写入到ftp下的phplib下
+					generatePhpClassFile(runJarApi, in);
+
+					// 完成所有操作尝试关闭ftp服务器
+					logger.info("执行完所有phpClass转化工作，尝试关闭ftp服务器连接...");
+					ftpUtils.closeServer();
+				} catch (IOException e)
+				{
+					logger.info("尝试关闭服务器失败..." + e.getMessage(), e);
+				}
+			}
+		};
+
+		ExecutorService exec = Executors.newSingleThreadExecutor();
+		exec.execute(task);
+
+	}
+
+	/**
+	 * 获取测试转化的vm留
+	 * 
+	 * @return
+	 */
+	private InputStream getTestVmFile()
+	{
+		VelocityEngine ve = new VelocityEngine();
+		ve.init();
+
+		Template t = ve.getTemplate("src/main/webapp/WEB-INF/layout/hello-velocity.vm");
+		VelocityContext ctx = new VelocityContext();
+
+		ctx.put("name", "velocity");
+		ctx.put("date", (new Date()).toString());
+
+		List<String> temp = new ArrayList<String>();
+		temp.add("1");
+		temp.add("2");
+		ctx.put("list", temp);
+
+		StringWriter sw = new StringWriter();
+
+		t.merge(ctx, sw);
+		String result = sw.toString();
+		logger.info(result);
+
+		InputStream in = new ByteArrayInputStream(result.getBytes());
+		return in;
+	}
+
+	/**
+	 * 下载至临时文件夹
+	 * 
+	 * @param jarApi
+	 */
+	private void downloadToTempFile(JarApi jarApi, HttpServletRequest request)
 	{
 		String serviceName = jarApi.getServiceName();
-		String sourceFilepath = "sourcelib" + "/" + serviceName;
-		String phpFilepath = "phplib" + "/" + serviceName;
+		String filepath = "sourcelib" + "/" + serviceName;
+		String temppath = "tempfile";
 
-		boolean isCreateDirectory;
 		try
 		{
-			isCreateDirectory = ftpUtils.createDirectory(phpFilepath);
-			String phpClass = generatePhpClassName(jarApi);
-			logger.info("isCreatePhpDirectory=> " + isCreateDirectory + " || phpClass=> " + phpClass);
+			List<String> files = ftpUtils.getFileList(filepath);
 
-			List<String> files = ftpUtils.getFileList(sourceFilepath);
-			String tempPath = sourceFilepath;
+			String sourcepath = StringUtils.EMPTY;
+			String combinePath = temppath;
+
 			for (String file : files)
 			{
-				tempPath = tempPath + "/" + file;
+				sourcepath = filepath + "/" + file;
+				serviceName = serviceName.replaceAll("\\.", "-");
+				combinePath = temppath + "/" + String.format("%s-%s", serviceName, file);
+
+				ftpUtils.downloadFile(sourcepath, combinePath);
 			}
 
 		} catch (IOException e)
@@ -189,9 +283,38 @@ public class ApiUploadFormController extends BasicController
 	/**
 	 * 将Java Source Api翻译成php Class
 	 */
-	private void translateJavaToPhp()
+	private InputStream translateJavaToPhp()
 	{
+		return null;
+	}
 
+	/**
+	 * 写入phpclass到指定phplib
+	 * 
+	 * @param jarApi
+	 *            拼接写入的php文件路径
+	 * @param filepath
+	 *            临时文件目录
+	 */
+	private void generatePhpClassFile(JarApi jarApi, InputStream in)
+	{
+		String serviceName = jarApi.getServiceName();
+		String phpFilepath = "phplib" + "/" + serviceName;
+
+		boolean isCreateDirectory;
+		try
+		{
+			isCreateDirectory = ftpUtils.createDirectory(phpFilepath);
+			String phpClassName = generatePhpClassName(jarApi);
+			logger.info("isCreatePhpDirectory=> " + isCreateDirectory + " || phpClass=> " + phpClassName);
+			boolean isSuccess = ftpUtils.uploadFile(in, phpFilepath + "/" + phpClassName);
+			logger.info("上传php文件: " + phpClassName + "=>是否成功: " + isSuccess);
+
+		} catch (IOException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	/**

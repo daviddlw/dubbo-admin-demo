@@ -1,7 +1,5 @@
 package com.david.test;
 
-import static org.junit.Assert.*;
-
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Date;
@@ -12,27 +10,15 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
-import org.junit.Before;
-import org.junit.Test;
 
-public class TestVelocityTemplate
+public class TestMain
 {
-
-	@Before
-	public void setUp() throws Exception
+	public static void main(String[] args)
 	{
+		testGenerateVelocityTemplate();
 	}
 	
-	@Test
-	public void testService()
-	{
-		String serviceName = "com.david.DavidService";
-		serviceName = serviceName.replaceAll("\\.", "-");
-		System.out.println(serviceName);
-	}
-
-	@Test
-	public void testGenerateVelocityTemplate()
+	public static void testGenerateVelocityTemplate()
 	{
 		VelocityEngine ve = new VelocityEngine();		
 		ve.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
@@ -40,7 +26,7 @@ public class TestVelocityTemplate
 
 		ve.init();
 
-		Template t = ve.getTemplate("HelloVelcity.vm");
+		Template t = ve.getTemplate("src/main/resources/HelloVelcity.vm");
 		VelocityContext ctx = new VelocityContext();
 
 		ctx.put("name", "velocity");
@@ -58,5 +44,4 @@ public class TestVelocityTemplate
 		System.out.println(sw.toString());
 
 	}
-
 }

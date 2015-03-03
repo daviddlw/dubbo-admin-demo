@@ -76,16 +76,20 @@ public class FtpUtils
 	 */
 	public void connectServer(String server, int port, String username, String password, String path) throws IOException
 	{
-		ftp.connect(server, port);
-		ftp.setDataTimeout(DATA_TIME_OUT);
-		/*
-		 * if (!FTPReply.isPositiveCompletion(ftp.getReply())) {
-		 * ftp.disconnect(); System.out.println(server + "cannot connect..."); }
-		 */
-		ftp.login(username, password);
-		if (path.length() != 0)
+		if (!ftp.isConnected())
 		{
-			ftp.changeWorkingDirectory(path);
+			ftp.connect(server, port);
+			ftp.setDataTimeout(DATA_TIME_OUT);
+			/*
+			 * if (!FTPReply.isPositiveCompletion(ftp.getReply())) {
+			 * ftp.disconnect(); System.out.println(server +
+			 * "cannot connect..."); }
+			 */
+			ftp.login(username, password);
+			if (path.length() != 0)
+			{
+				ftp.changeWorkingDirectory(path);
+			}
 		}
 	}
 
@@ -98,7 +102,7 @@ public class FtpUtils
 	 */
 	public void setFileType(int fileType) throws IOException
 	{
-		ftp.setFileType(fileType);		
+		ftp.setFileType(fileType);
 	}
 
 	/**
